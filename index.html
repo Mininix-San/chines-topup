@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>佣金和套餐面板</title>
+    <style>
+        body {
+            background-image: url('https://r4.wallpaperflare.com/wallpaper/671/31/673/tv-show-star-vs-the-forces-of-evil-star-butterfly-wallpaper-a920088dc10a7dfbd63728bff031867d.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .panel {
+            width: 22%;
+            padding: 20px;
+            border: 2px solid #FF6EC7;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            margin: 20px;
+            display: inline-block;
+            vertical-align: top;
+            background-color: rgba(255, 255, 255, 0.9);
+            position: relative;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #FF6EC7;
+        }
+        button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            background-color: #FFD700;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid #FF6EC7;
+            border-radius: 5px;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            color: #FF6EC7;
+        }
+        p {
+            margin: 10px 0;
+            padding: 0;
+        }
+        .instruction {
+            color: #FF6EC7;
+            font-size: 0.9em;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+    </style>
+    <script>
+        let exchangeRate = 5.69;
+        let pacoteQuantidades = {
+            10: 0,
+            30: 0,
+            50: 0,
+            100: 0
+        };
+
+        const pacotePrecos = {
+            10: 7.30,
+            30: 21.00,
+            50: 35.00,
+            100: 70.00
+        };
+
+        function updatePacoteQuantidades(pacote, quantidade) {
+            pacoteQuantidades[pacote] = parseInt(quantidade) || 0;
+            updatePacoteTotals();
+        }
+
+        function updatePacoteTotals() {
+            let totalR = 0;
+            let totalD = 0;
+            Object.keys(pacoteQuantidades).forEach(pacote => {
+                const subtotalR = pacoteQuantidades[pacote] * pacotePrecos[pacote] * exchangeRate;
+                const subtotalD = pacoteQuantidades[pacote] * pacotePrecos[pacote];
+                document.getElementById(`totalR${pacote}`).innerText = subtotalR.toFixed(2);
+                document.getElementById(`totalD${pacote}`).innerText = subtotalD.toFixed(2);
+                totalR += subtotalR;
+                totalD += subtotalD;
+            });
+            document.getElementById('totalRPacotes').innerText = totalR.toFixed(2);
+            document.getElementById('totalDPacotes').innerText = totalD.toFixed(2);
+        }
+
+        function copyToClipboard() {
+            const totalR = document.getElementById('totalRPacotes').innerText;
+            const totalD = document.getElementById('totalDPacotes').innerText;
+            const quantidades = Object.keys(pacoteQuantidades)
+                .filter(pacote => pacoteQuantidades[pacote] > 0)
+                .map(pacote => `\$${pacote} 套餐: ${pacoteQuantidades[pacote]}`)
+                .join('\n');
+            const login = document.getElementById('login').value;
+            const password = document.getElementById('password').value;
+            const nickname = document.getElementById('nickname').value;
+            const level = document.getElementById('level').value;
+            const server = document.getElementById('server').value;
+
+            let additionalInfo = '';
+            if (login) additionalInfo += `登录: ${login}\n`;
+            if (password) additionalInfo += `密码: ${password}\n`;
+            if (nickname) additionalInfo += `昵称: ${nickname}\n`;
+            if (level) additionalInfo += `等级: ${level}\n`;
+            if (server) additionalInfo += `服务器: ${server}\n`;
+
+            const textToCopy = `总计 (R$): ${totalR}\n总计 ($): ${totalD}\n${quantidades}\n${additionalInfo}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('信息已复制到剪贴板!');
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="panel">
+        <h2>$10 套餐</h2>
+        <label for="pacote10">数量:</label>
+        <input type="number" id="pacote10" value="0" oninput="updatePacoteQuantidades(10, this.value)"><br>
+        <p>折扣价: $7.30</p>
+        <p>总计: R$<span id="totalR10">0.00</span> / $<span id="totalD10">0.00</span></p>
+    </div>
+    <div class="panel">
+        <h2>$30 套餐</h2>
+        <label for="pacote30">数量:</label>
+        <input type="number" id="pacote30" value="0" oninput="updatePacoteQuantidades(30, this.value)"><br>
+        <p>折扣价: $21.00</p>
+        <p>总计: R$<span id="totalR30">0.00</span> / $<span id="totalD30">0.00</span></p>
+    </div>
+    <div class="panel">
+        <h2>$50 套餐</h2>
+        <label for="pacote50">数量:</label>
+        <input type="number" id="pacote50" value="0" oninput="updatePacoteQuantidades(50, this.value)"><br>
+        <p>折扣价: $35.00</p>
+        <p>总计: R$<span id="totalR50">0.00</span> / $<span id="totalD50">0.00</span></p>
+    </div>
+    <div class="panel">
+        <h2>$100 套餐</h2>
+        <label for="pacote100">数量:</label>
+        <input type="number" id="pacote100" value="0" oninput="updatePacoteQuantidades(100, this.value)"><br>
+        <p>折扣价: $70.00</p>
+        <p>总计: R$<span id="totalR100">0.00</span> / $<span id="totalD100">0.00</span></p>
+    </div>
+    <div class="panel">
+        <h2>所有套餐总计</h2>
+        <p>总计: R$<span id="totalRPacotes">0.00</span> / $<span id="totalDPacotes">0.00</span></p>
+        <label for="login">登录:</label>
+        <input type="text" id="login"><br>
+        <label for="password">密码:</label>
+        <input type="text" id="password"><br>
+        <label for="nickname">昵称:</label>
+        <input type="text" id="nickname"><br>
+        <label for="level">等级:</label>
+        <input type="text" id="level"><br>
+        <label for="server">服务器:</label>
+        <input type="text" id="server"><br>
+        <button onclick="copyToClipboard()">复制总计</button>
+        <span class="instruction">点击复制信息和总计</span>
+    </div>
+    <div class="panel">
+        <h2>支付信息</h2>
+        <p>Pix: 手机 14988231270 名称: Victoria Stefany</p>
+        <p>Mercado Pago: <a href="https://link.mercadopago.com.br/ervindanada" target="_blank">链接</a></p>
+        <p>Binance: estrela203@hotmail.com</p>
+    </div>
+</body>
+</html>
